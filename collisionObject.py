@@ -1,2 +1,4 @@
+collisionQueue = []
+
 class collisionObejct:
     pass
