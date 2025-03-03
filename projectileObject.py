@@ -1,21 +1,35 @@
-from collisionObject import *
+from DrawableObject import DrawableObject
+import math
+from pygame import Vector2 as vec2
 
-projetileQueue = []
 
-class projectileObject(collisionObejct):
-    def __init__(self, Position, Direction, HasCollision = 1):
-        global projetileQueue
-        global collisionQueue
-        self.Position = Position
-        self.Direction = Direction
-        self.Lifespan = 0
-        projetileQueue.append(self)
-        if HasCollision:
-            collisionQueue.append(self)
+ProjetileQueue = []
+ProjectileTexture = []
 
-    def update(self, deltaTime):
-        self.Position = self.Position + deltaTime * self.Direction
-        self.Lifespan += deltaTime
-        if self.Lifespan > 5000:
-            projetileQueue.remove(self)
-            collisionQueue.remove(self)
+class ProjectileObject(DrawableObject):
+    def _DrawableObjectInit(Self):
+        Self.Texture = ProjectileTexture[Self.Type]
+        Self.Scale = 1
+        Self.Rotation = math.degrees(math.atan2(Self.Direction.y, Self.Direction.x))
+        Self.Pivot = Self.Texture.Pivot
+        Self.FlipX = 0
+        Self.FlipY = 0
+
+    def __init__(Self, Pos: vec2, Direction: vec2, Type=0, Velocity=1):
+        global ProjetileQueue
+        Self.Pos = Pos
+        Self.Direction = Direction
+        Self.Type = Type
+        Self.Velocity = Velocity
+        Self.Lifespan = 0
+        Self._DrawableObjectInit()
+        ProjetileQueue.append(Self)
+
+    def update(Self, DeltaTime):
+        Self.Pos = Self.Pos + DeltaTime * Self.Direction * Self.Velocity
+        Self.Lifespan += DeltaTime
+        if Self.Lifespan > 5000:
+            ProjetileQueue.remove(Self)
+
+    def draw(Self):
+        Self.drawCentered()

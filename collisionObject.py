@@ -1,4 +1,2 @@
-collisionQueue = []
-
-class collisionObejct:
-    pass
+# watch this:
+# https://youtu.be/tJiKYMQJnYg?si=KAat1Jfua-Hfp-MZ

@@ -1,4 +1,3 @@
-from collisionObject import collisionObejct
-
-class entity(collisionObejct):
+from DrawableObject import DrawableObject
+class EntityObject(DrawableObject):
     pass

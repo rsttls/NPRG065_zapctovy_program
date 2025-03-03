@@ -2,30 +2,47 @@ import pygame
 import pygame.locals
 import math
 import time
+import os
 
-from texture import texture
-from projectileObject import *
+from TextureObject import TextureObject
+from ProjectileObject import *
+from pygame import Vector2 as vec2
 
 # global variables
 Width, Height = 640, 480  # window size
-CameraX, CameraY = 0, 0  # camera position
 MainLoopActive = 1  # if main loop is active
+prevMark = time.time_ns() / 1000000
+currMark = time.time_ns() / 1000000
 
 # init
 pygame.init()
 pygame.display.set_caption("IDK Game")
-prevMark = time.time_ns() / 1000000
-currMark = time.time_ns() / 1000000
-
 Display = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, vsync=1)
 desktopWidth, desktopHeight = pygame.display.get_window_size()
+(Width, Height) = (desktopWidth, desktopHeight)
 pygame.mouse.set_visible(0)
-cursorTexture = texture("./assets/cursor.bmp")
-MainCharacterTexture = texture("./assets/ilum.bmp")
-GunTexture = texture("./assets/gun.bmp")
-BulletTexture = texture("./assets/bullet.bmp")
-MainCharX = 0
-MainCharY = 0
+
+
+# texture loading
+# loads projectile texutures by type
+i = 0
+while 1:
+    if not os.path.isfile(
+        os.path.dirname(__file__) + "./assets/projectile/" + str(i) + ".bmp"
+    ):
+        break
+    ProjectileTexture.append(
+        TextureObject("./assets/projectile/" + str(i) + ".bmp", PreScale=3)
+    )
+    i += 1
+
+
+# code prototyping
+AmmoType = 0
+cursorTexture = TextureObject("./assets/cursor.bmp", PreScale=2)
+MainCharacterTexture = TextureObject("./assets/ilum.bmp", PreScale=2)
+GunTexture = TextureObject("./assets/gun.bmp", PreScale=2)
+MainCharPos = vec2(100, 100)
 MainCharVel = 0.5  # pixel/ms
 
 while MainLoopActive:
@@ -53,41 +70,56 @@ while MainLoopActive:
                         (desktopWidth, desktopHeight), pygame.FULLSCREEN, vsync=1
                     )
                     Width, Height = desktopWidth, desktopHeight
+            if Event.key == pygame.K_SPACE:
+                ProjectileObject(
+                    GunCenterPos,
+                    vec2(mousePos - GunCenterPos).normalize(),
+                    Type=AmmoType,
+                    Velocity=1,
+                )
+            if Event.key == pygame.K_LSHIFT:
+                AmmoType = 1 if AmmoType == 0 else 0
         elif Event.type == pygame.MOUSEBUTTONDOWN:
-            projectileObject(
-                GunPos,
-                pygame.Vector2(mouseX - (GunPos[0] + 64), mouseY - (GunPos[1] + 64))
-                / 1000,
+            ProjectileObject(
+                GunCenterPos,
+                vec2(mousePos - GunCenterPos).normalize(),
+                Type=AmmoType,
+                Velocity=1,
             )
     keysPressed = pygame.key.get_pressed()
     if keysPressed[pygame.K_a]:
-        MainCharX -= MainCharVel * deltaTime
+        MainCharPos.x -= MainCharVel * deltaTime
     if keysPressed[pygame.K_d]:
-        MainCharX += MainCharVel * deltaTime
+        MainCharPos.x += MainCharVel * deltaTime
     if keysPressed[pygame.K_w]:
-        MainCharY -= MainCharVel * deltaTime
+        MainCharPos.y -= MainCharVel * deltaTime
     if keysPressed[pygame.K_s]:
-        MainCharY += MainCharVel * deltaTime
-    (mouseX, mouseY) = pygame.mouse.get_pos()
+        MainCharPos.y += MainCharVel * deltaTime
+    mousePos = vec2(pygame.mouse.get_pos())
     # update
-    for projectile in projetileQueue:
+    for projectile in ProjetileQueue:
         projectile.update(deltaTime)
 
     # gun pos/rot
-    GunPos = (MainCharX + 20, MainCharY + 10)
-    GunRotation = math.atan2(mouseY - (GunPos[1] + 64), mouseX - (GunPos[0] + 64))
+    GunCenterPos = vec2(MainCharPos.x + 96, MainCharPos.y + 74)
+    GunRotation = math.degrees(math.atan2(mousePos.y - GunCenterPos.y, mousePos.x - GunCenterPos.x))
 
     # draw
     Display.fill((50, 50, 50))
 
-    for projectile in projetileQueue:
-        BulletTexture.draw(projectile.Position[0] + 32, projectile.Position[1] + 32)
+    MainCharacterTexture.draw(MainCharPos)
+    for projectile in ProjetileQueue:
+        projectile.draw()
 
-    MainCharacterTexture.draw(MainCharX, MainCharY, 2)
-    if 1.5708 < GunRotation or GunRotation < -1.5708:
-        GunTexture.draw(GunPos[0], GunPos[1], 2, math.degrees(GunRotation), flipY=1)
+    print(str(GunRotation))
+    if 90 < GunRotation or GunRotation < -90:
+        GunTexture.drawCentered(
+            GunCenterPos,
+            Rotation=GunRotation,
+            FlipY=1,
+        )
     else:
-        GunTexture.draw(GunPos[0], GunPos[1], 2, math.degrees(GunRotation))
+        GunTexture.drawCentered(GunCenterPos, Rotation=GunRotation)
 
-    cursorTexture.draw(mouseX - 32, mouseY - 32, 2)
+    cursorTexture.drawCentered(mousePos)
     pygame.display.update()
