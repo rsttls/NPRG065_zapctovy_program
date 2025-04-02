@@ -1,0 +1,1 @@
+$env:PATH += ";" + (Resolve-Path "../cc65/bin").Path

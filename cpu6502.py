@@ -128,6 +128,11 @@ class cpu6502:
         Self._updateNZ(Value)
         Self.C = 1 if Value & 0x100 != 0 else 0
 
+    def cycle(Self):
+        if Self.Cycles == 0:
+            Self.step()
+        Self.Cycles -= 1
+
     def step(Self):
         match Self.Memory[Self.PC]:
 
