@@ -165,7 +165,7 @@ class cpu6502:
                 Self.PC = (Self.PC + 3) & 0xFFFF
             case 0x7D:  # ADC absolute,X
                 Self.Cycles = 4
-                Self._addressingAbsoluteX(Self.PC + 1)
+                p = Self._addressingAbsoluteX(Self.PC + 1)
                 Operand = Self.Memory[p]
                 Result = Self.A + Operand + Self.C
                 Self._ADCFlags(Self.A, Operand, Result)
@@ -173,7 +173,7 @@ class cpu6502:
                 Self.PC = (Self.PC + 3) & 0xFFFF
             case 0x79:  # ADC absolute,Y
                 Self.Cycles = 4
-                Self._addressingAbsoluteY(Self.PC + 1)
+                p = Self._addressingAbsoluteY(Self.PC + 1)
                 Operand = Self.Memory[p]
                 Result = Self.A + Operand + Self.C
                 Self._ADCFlags(Self.A, Operand, Result)
@@ -400,7 +400,7 @@ class cpu6502:
                 M = Self.Memory[Self._readShort(Self.PC + 1)]
                 Self.N = 1 if M & 0x80 else 0
                 Self.V = 1 if M & 0x40 else 0
-                Self.Z = 1 if M & Self.A == 0 else 0
+                Self.Z = 1 if (M & Self.A) == 0 else 0
                 Self.PC = (Self.PC + 3) & 0xFFFF
 
             case 0x00:  # BRK
@@ -1082,7 +1082,7 @@ class cpu6502:
                 PCL = Self._pull()
                 PCH = Self._pull()
                 PC = PCL + (PCH << 8)
-                Self.PC = PC + 1 & 0xFFFF
+                Self.PC = (PC + 1) & 0xFFFF
 
             # SBC Subtract Memory from Accumulator with Borrow
 
