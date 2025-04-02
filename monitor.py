@@ -11,7 +11,7 @@ class monitor:
         pygame.display.set_caption("6502")
         Self.Width = 320 * Scale
         Self.Height = 320 * Scale
-        Self.Display = pygame.display.set_mode((Self.Width, Self.Height))
+        Self.Display = pygame.display.set_mode((Self.Width, Self.Height), vsync=1)
 
     def _8bitTo24bitColor(Self, Color: int):
         r = (Color >> 5) & 0x7
@@ -25,11 +25,6 @@ class monitor:
 
     # read memory 0x200 - 0x5FF
     def update(Self):
-        # it wants events
-        for event in pygame.event.get():
-            if event.type == pygame.locals.QUIT:
-                Self.WindowOpen = 0
-
         for x in range(32):
             for y in range(32):
                 M = Self.Memory[0x200 + (y * 32) + x]

@@ -1,6 +1,8 @@
 from cpu6502 import cpu6502
 from monitor import monitor
 from printer import printer
+import pygame
+import pygame.locals
 import threading
 from sys import argv
 # Create and load memory
@@ -13,7 +15,7 @@ with open(argv[1], "rb") as f:
         i+=1
 
 Cpu = cpu6502(Memory)
-Monitor = monitor(Memory)
+Monitor = monitor(Memory,Scale=2)
 Printer = printer(Memory)
 
 killThread2 = 0
@@ -32,6 +34,10 @@ while(Monitor.WindowOpen):
     # if this address is set than the program ends
     if(Memory[0xFE] == 127):
         break
+    # it wants events in main thread
+    for event in pygame.event.get():
+        if event.type == pygame.locals.QUIT:
+            Monitor.WindowOpen = 0
     Cpu.step()
 
 killThread2 = 1
