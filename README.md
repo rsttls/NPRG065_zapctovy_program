@@ -9,7 +9,7 @@ Then 0xFF whre you can store a character and 0xFE is "a instruction byte" if set
 
 # cc65
 
-cc65 is a compiler for 6502. To use it here just add ./cc65/bin to PATH and you can make the example.
+cc65 is a compiler for 6502. To use it here just add cc65/bin to PATH and you can make the example.
 In c it is a basic entry point function called void entry(void).
 
 # Cycles
