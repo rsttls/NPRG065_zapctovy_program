@@ -22,17 +22,18 @@ Printer = printer(Memory)
 
 # Multithreading
 killThread2 = 0
-def miscLoop():
+def cpuLoop():
     """
-        A function to offload the monitor and printer updates to another thread
+        A function to offload the 6502cpu to another thread
     """
     while(killThread2 == 0):
-        # monitors 0x200 - 0x5FF and displays colors
-        Monitor.update()
-        # monitors 0xFF for character and if 0xFE == 1 then print character
-        Printer.update()
-
-thread2 = threading.Thread(target=miscLoop, daemon=True)
+        # if this address is set to 127 than the program ends
+        if(Memory[0xFE] == 127):
+            break
+        # using step function instead of cycle to speed up the cpu
+        Cpu.step()
+        
+thread2 = threading.Thread(target=cpuLoop, daemon=True)
 thread2.start()
 
 
@@ -45,8 +46,12 @@ while(Monitor.WindowOpen):
     for event in pygame.event.get():
         if event.type == pygame.locals.QUIT:
             Monitor.WindowOpen = 0
-    # using step function instead of cycle to speed up the cpu
-    Cpu.step()
+
+    # monitors 0x200 - 0x5FF and displays colors
+    Monitor.update()
+    # monitors 0xFF for character and if 0xFE == 1 then print character
+    Printer.update()
+
 
 killThread2 = 1
 thread2.join()

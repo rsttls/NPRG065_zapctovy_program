@@ -39,18 +39,20 @@ void delay(short cycles)
 }
 
 
-
+#define MAX_CYCLE 1500
 void entry()
 {
     // cc65 wants all variables declared before the code section
     char *hi = "This a red square walking on the screen\n";
     unsigned short i = 0;
+    int cycle = 0;
     print(hi);
-    while (1)
+    while (cycle < MAX_CYCLE)
     {
         setByte(0x200 + i, 0x0);
         i = (i + 1) % (32 * 32);
         setByte(0x200 + i, 0xE0);
-        delay(100);
+        delay(150);
+        cycle++;
     }
 }
